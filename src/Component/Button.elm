@@ -1,7 +1,18 @@
-module Component.Button exposing (..)
+module Component.Button exposing
+    ( Button
+    , Size(..)
+    , Variant(..)
+    , new
+    , view
+    , withIcon
+    , withOnClick
+    , withSize
+    , withVariant
+    )
 
 import Html exposing (Html, button, text)
 import Html.Attributes exposing (class)
+import Html.Events exposing (onClick)
 import Utils.MaybeEx as MaybeEx
 
 
@@ -11,6 +22,7 @@ type Button msg
         , variant : Variant
         , size : Size
         , icon : Maybe (Html msg)
+        , onClick : Maybe msg
         }
 
 
@@ -39,6 +51,7 @@ new props =
         , variant = Default
         , size = DefaultSize
         , icon = Nothing
+        , onClick = Nothing
         }
 
 
@@ -55,6 +68,11 @@ withSize size (Settings settings) =
 withIcon : Html msg -> Button msg -> Button msg
 withIcon icon (Settings settings) =
     Settings { settings | icon = Just icon }
+
+
+withOnClick : msg -> Button msg -> Button msg
+withOnClick msg (Settings settings) =
+    Settings { settings | onClick = Just msg }
 
 
 baseClass : String
@@ -129,8 +147,12 @@ sizeClass size =
 view : Button msg -> Html msg
 view (Settings settings) =
     button
-        [ class baseClass
-        , class <| variantClass settings.variant
-        , class <| sizeClass settings.size
-        ]
-        (MaybeEx.toList settings.icon ++ [ text settings.label ])
+        ([ class baseClass
+         , class <| variantClass settings.variant
+         , class <| sizeClass settings.size
+         ]
+            |> MaybeEx.maybeCons (Maybe.map onClick settings.onClick)
+        )
+        ([ text settings.label ]
+            |> MaybeEx.maybeCons settings.icon
+        )

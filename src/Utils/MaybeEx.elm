@@ -9,3 +9,13 @@ toList x =
 
         Nothing ->
             []
+
+
+maybeCons : Maybe a -> List a -> List a
+maybeCons maybe l =
+    case maybe of
+        Just m ->
+            m :: l
+
+        Nothing ->
+            l
