@@ -27,7 +27,7 @@ import Task
 
 
 type Dropdown item msg
-    = Settings
+    = Dropdown
         { model : Model item
         , toMsg : Msg item msg -> msg
         , choices : List item
@@ -48,7 +48,7 @@ new :
     }
     -> Dropdown item msg
 new props =
-    Settings
+    Dropdown
         { model = props.model
         , toMsg = props.toMsg
         , choices = props.choices
@@ -92,31 +92,31 @@ type Size
 
 
 withSizeSmall : Dropdown item msg -> Dropdown item msg
-withSizeSmall (Settings settings) =
-    Settings { settings | size = Small }
+withSizeSmall (Dropdown settings) =
+    Dropdown { settings | size = Small }
 
 
 withDisabled : Dropdown item msg -> Dropdown item msg
-withDisabled (Settings settings) =
-    Settings { settings | isDisabled = True }
+withDisabled (Dropdown settings) =
+    Dropdown { settings | isDisabled = True }
 
 
 withOnChange :
     (item -> msg)
     -> Dropdown item msg
     -> Dropdown item msg
-withOnChange onChange (Settings settings) =
-    Settings { settings | onChange = Just onChange }
+withOnChange onChange (Dropdown settings) =
+    Dropdown { settings | onChange = Just onChange }
 
 
 withTriggerLabel : String -> Dropdown item msg -> Dropdown item msg
-withTriggerLabel label (Settings settings) =
-    Settings { settings | triggerLabel = label }
+withTriggerLabel label (Dropdown settings) =
+    Dropdown { settings | triggerLabel = label }
 
 
 withCustomTrigger : Html msg -> Dropdown item msg -> Dropdown item msg
-withCustomTrigger t (Settings settings) =
-    Settings { settings | customTrigger = Just t }
+withCustomTrigger t (Dropdown settings) =
+    Dropdown { settings | customTrigger = Just t }
 
 
 
@@ -184,7 +184,7 @@ update props =
 
 
 view : Dropdown item msg -> Html msg
-view (Settings settings) =
+view (Dropdown settings) =
     let
         (Model model) =
             settings.model

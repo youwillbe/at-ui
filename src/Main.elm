@@ -1,98 +1,115 @@
 module Main exposing (..)
 
-import Animal exposing (Animal)
 import Browser
-import Component.Button as Button
-import Component.Dropdown as Dropdown
-import Component.ImageCard as ImageCard
-import Component.Marker as Marker
-import Html exposing (Html, button, div, span, text)
-import Html.Attributes exposing (class)
-import Html.Events exposing (onClick)
+import Browser.Navigation
+import Json.Decode
+import Main.Layouts.Model
+import Main.Pages.Model
+import Route
+import Shared
+import Url exposing (Url)
+import View exposing (View)
 
 
+main : Program Json.Decode.Value Model Msg
 main =
-    Browser.element
+    Browser.application
         { init = init
         , view = view
         , update = update
         , subscriptions = subscriptions
+        , onUrlChange = UrlChanged
+        , onUrlRequest = UrlRequest
         }
 
 
-testButton : Html msg
-testButton =
-    Button.new { label = "" }
-        |> Button.withVariant Button.Neutral
-        |> Button.withSize Button.Icon
-        |> Button.withIcon (icon "iconify lucide--upload text-xl")
-        |> Button.view
 
-
-icon : String -> Html msg
-icon name =
-    span [ class name ] []
+-- MODEL
 
 
 type alias Model =
-    { dropdown : Dropdown.Model Animal
+    { key : Browser.Navigation.Key
+    , url : Url
+    , page : Main.Pages.Model.Model
+    , layout : Maybe Main.Layouts.Model.Model
+    , shared : Shared.Model
     }
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( { dropdown = Dropdown.init { selected = Nothing }
+init : Json.Decode.Value -> Url -> Browser.Navigation.Key -> ( Model, Cmd Msg )
+init json url key =
+    let
+        -- 1. 解析 flag
+        flagResult =
+            Json.Decode.decodeValue Shared.decoder json
+
+        -- 2. 解析 url 为 Route
+        route =
+            Route.fromUrl () url
+
+        -- 3. shared 有可能是存储后再还原回来的，所以初始化的时候需要 flag
+        ( sharedModel, sharedEffect ) =
+            Shared.init flagResult route
+
+        page =
+            Debug.todo "page"
+
+        layout =
+            Debug.todo "page"
+    in
+    ( { key = key
+      , url = url
+      , page = page
+      , layout = layout
+      , shared = sharedModel
       }
     , Cmd.none
     )
 
 
+
+-- VIEW
+
+
+view : Model -> Browser.Document Msg
+view model =
+    pageView model
+
+
+pageView : Model -> View Msg
+pageView model =
+    case model.page of
+        Main.Pages.Model.Home ->
+            Debug.todo "todo"
+
+        Main.Pages.Model.NotFound ->
+            Debug.todo "todo"
+
+        Main.Pages.Model.Redirecting ->
+            Debug.todo "todo"
+
+        Main.Pages.Model.Loading ->
+            Debug.todo "todo"
+
+
+
+-- UPDATE
+
+
 type Msg
-    = DropdownSent (Dropdown.Msg Animal Msg)
-    | ChangedSelection Animal
+    = UrlRequest Browser.UrlRequest
+    | UrlChanged Url
+    | Page
+    | Layout
+    | Shared
+    | Batch (List Msg)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update msg model =
-    case msg of
-        DropdownSent innerMsg ->
-            Dropdown.update
-                { msg = innerMsg
-                , model = model.dropdown
-                , toModel = \dropdown -> { model | dropdown = dropdown }
-                , toMsg = DropdownSent
-                }
-
-        ChangedSelection animal ->
-            ( model, Cmd.none )
+update =
+    Debug.todo "todo"
 
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    Sub.none
-
-
-view : Model -> Html Msg
-view model =
-    div [ class "h-screen w-screen grid place-items-center" ]
-        [ div [ class "space-y-4" ]
-            [ testButton
-            , ImageCard.new
-                { caption = "Image"
-                , imageUrl = "https://hips.hearstapps.com/hmg-prod/images/flowers-trees-and-bushes-reach-their-peak-of-full-bloom-in-news-photo-1678292967.jpg?resize=300:*"
-                }
-                |> ImageCard.view
-            , Marker.new { content = "Searched the web" }
-                |> Marker.withIcon "iconify lucide--globe"
-                |> Marker.view
-            , Dropdown.new
-                { model = model.dropdown
-                , toMsg = DropdownSent
-                , choices = Animal.list
-                , toLabel = Animal.toName
-                }
-                |> Dropdown.withOnChange ChangedSelection
-                |> Dropdown.withTriggerLabel "点我"
-                |> Dropdown.view
-            ]
-        ]
+subscriptions =
+    Debug.todo "todo"
