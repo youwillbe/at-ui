@@ -42,3 +42,8 @@ withOnUrlChanged :
     -> Page model msg
 withOnUrlChanged onChange (Page page) =
     Page { page | onUrlChanged = Just onChange }
+
+
+init : Page model msg -> () -> ( model, Effect msg )
+init (Page page) =
+    page.init

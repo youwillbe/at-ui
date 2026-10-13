@@ -5,7 +5,10 @@ import Browser.Navigation
 import Json.Decode
 import Main.Layouts.Model
 import Main.Pages.Model
+import Page
+import Pages.Home
 import Route
+import Route.Path
 import Shared
 import Url exposing (Url)
 import View exposing (View)
@@ -51,8 +54,8 @@ init json url key =
         ( sharedModel, sharedEffect ) =
             Shared.init flagResult route
 
-        page =
-            Debug.todo "page"
+        ( page, pageCmd ) =
+            initPage route
 
         layout =
             Debug.todo "page"
@@ -67,6 +70,24 @@ init json url key =
     )
 
 
+initPage : Route.Route () -> ( Main.Pages.Model.Model, Cmd Msg )
+initPage route =
+    case route.path of
+        Route.Path.Home ->
+            let
+                -- 由于页面只暴露 page 函数，也就是上层工作在包装类型 Page page 上
+                page =
+                    Pages.Home.page () route
+
+                ( homeModel, homeEffect ) =
+                    Page.init page ()
+            in
+            ( Main.Pages.Model.Home homeModel, Cmd.none )
+
+        Route.Path.NotFound ->
+            ( Main.Pages.Model.NotFound, Cmd.none )
+
+
 
 -- VIEW
 
@@ -79,8 +100,10 @@ view model =
 pageView : Model -> View Msg
 pageView model =
     case model.page of
-        Main.Pages.Model.Home ->
-            Debug.todo "todo"
+        Main.Pages.Model.Home homeModel ->
+            { title = ""
+            , body = []
+            }
 
         Main.Pages.Model.NotFound ->
             Debug.todo "todo"
